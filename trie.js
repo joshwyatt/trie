@@ -1,10 +1,14 @@
+// a re[trie]val Trie constructor. Each trie node will track how many words terminate with it
+// and how prefixes extend from it.
 var Trie = function(){
   this.words = 0;
   this.prefixes = 0;
   this.children = {};
 };
 
-Trie.prototype.insert = function(str, position){
+// for each character in the string, create a new trie where necessary, and always increment number
+// of prefixes at each position. At the end of the string, increment words for the final trie node.
+Trie.prototype.insertWord = function(str, position){
 
   if( str.length === 0 ) return;
 
@@ -23,10 +27,11 @@ Trie.prototype.insert = function(str, position){
 
   this.children[character] = this.children[character] || new Trie();
   child = this.children[character];
-  child.insert(str, position + 1);
+  child.insertWord(str, position + 1);
 
 };
 
+// for the given string, remove its path down the prefix tree, as well as its registry as a word
 Trie.prototype.remove = function(str, position){
 
   if( str.length === 0 ) return;
@@ -47,21 +52,23 @@ Trie.prototype.remove = function(str, position){
 
 };
 
-Trie.prototype.updateWord = function(oldString, newString){
+// remove oldString and replace it with newString
+Trie.prototype.updateWord = function(oldWord, newWord){
 
-  if( this === undefined || oldString.length === 0 || newString.length === 0 ) return;
+  if( this === undefined || oldWord.length === 0 || newWord.length === 0 ) return;
 
-  this.remove(oldString);
-  this.insert(newString);
+  this.remove(oldWord);
+  this.insertWord(newWord);
 };
 
+// count how many times a given string has been inserted into the trie
 Trie.prototype.countInstancesOfWord = function(str, position){
 
   if( this === undefined ) return;
   if( str.length === 0 ) return 0;
 
   var character = 0;
-  var character, child;
+  var character, child, count;
 
   position = position || 0;
 
@@ -73,18 +80,19 @@ Trie.prototype.countInstancesOfWord = function(str, position){
   child = this.children[character];
 
   if( child !== undefined ){
-    character = child.countInstancesOfWord(str, position + 1);
+    count = child.countInstancesOfWord(str, position + 1);
   }
-  return character;
+  return count;
 
 };
 
+// return how many prefixes extend off of a given string
 Trie.prototype.countPrefixesAt = function(str, position){
 
   if( str.length == 0 ) return 0;
 
   var character = 0;
-  var t, child;
+  var t, child, count;
 
   position = position || 0;
 
@@ -96,15 +104,16 @@ Trie.prototype.countPrefixesAt = function(str, position){
   child = this.children[k];
 
   if( child !== undefined ){
-    character = child.countPrefix(str, position + 1);
+    count = child.countPrefix(str, position + 1);
   }
 
-  return character;
+  return count;
 
 };
 
 
-Trie.prototype.isStringInTree = function(str){
+// return whether a string exists as a word in the tri
+Trie.prototype.isWordInTree = function(str){
 
   return str.length !== 0 && this.countInstancesOfWord(str) > 0;
 
