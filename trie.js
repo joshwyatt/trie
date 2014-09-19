@@ -112,35 +112,38 @@ Trie.prototype.countPrefixesAt = function(str, position){
 };
 
 
-// return whether a string exists as a word in the tri
+// return whether a string exists as a word in the trie
 Trie.prototype.isWordInTree = function(str){
 
   return str.length !== 0 && this.countInstancesOfWord(str) > 0;
 
 };
 
-// DEFINITELY FIX THIS ONE UP
-Trie.prototype.getAllWords = function(str){
+// return all words in the trie
+Trie.prototype.getAllWords = function(partialWord){
 
-  if( this === undefined ) return [];
+  if( this === undefined ){
+    return [];
+  }
 
-  var character = [];
+  var words = [];
   var k, child;
 
-  str = str || '';
+  partialWord = partialWord || '';
 
   if( this.words > 0 ){
-    character.push(str);
+    words.push(partialWord);
   }
 
   for( k in this.children ){
     child = this.children[k];
-    character = character.concat(child.getAllWords(str + k));
+    words = words.concat(child.getAllWords(partialWord + k));
   }
-  return character;
+  return words;
 
 };
 
+// return all possible completions of a word given a starting string
 Trie.prototype.autoComplete = function(str, position){
 
   if( str.length === 0 ) return [];
